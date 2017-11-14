@@ -22,7 +22,7 @@ import (
 // Resync writes ACLs to the empty VPP
 func (plugin *ACLConfigurator) Resync(acls []*acl.AccessLists_Acl, log logging.Logger) error {
 	log.Debug("Resync ACLs started")
-	// Calculate and log acl resync
+	// Calculate and log bfd resync
 	defer func() {
 		if plugin.Stopwatch != nil {
 			plugin.Stopwatch.PrintLog()
@@ -34,11 +34,10 @@ func (plugin *ACLConfigurator) Resync(acls []*acl.AccessLists_Acl, log logging.L
 	// Create VPP ACLs
 	log.Debugf("Configuring %v new ACLs", len(acls))
 	for _, aclInput := range acls {
-		plugin.ConfigureACL(aclInput, func(err error) {
-			if err != nil {
-				plugin.Log.Error(err)
-			}
-		})
+		err := plugin.ConfigureACL(aclInput)
+		if err != nil {
+			wasError = err
+		}
 	}
 
 	log.WithField("cfg", plugin).Debug("RESYNC ACLs end. ", wasError)

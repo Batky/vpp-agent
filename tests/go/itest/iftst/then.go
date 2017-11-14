@@ -11,7 +11,7 @@ import (
 	"github.com/ligato/cn-infra/logging/logroot"
 	vppclient "github.com/ligato/vpp-agent/clientv1/defaultplugins"
 	idx "github.com/ligato/vpp-agent/idxvpp"
-	"github.com/ligato/vpp-agent/plugins/defaultplugins"
+	"github.com/ligato/vpp-agent/plugins/defaultplugins/ifplugin/ifaceidx"
 	. "github.com/onsi/gomega"
 )
 
@@ -22,13 +22,17 @@ type ThenIface struct {
 	OperState ifstateGetter
 
 	Log logging.Logger
-	VPP defaultplugins.API
+	VPP defaultpluginsAPI
 }
 
 type ifstateGetter interface {
 	// InterfaceState reads operational state of network interface
 	// and fills it to ifState input parameter
 	InterfaceState(ifaceName string, ifState *intf.InterfacesState_Interface) (found bool, err error)
+}
+
+type defaultpluginsAPI interface {
+	GetSwIfIndexes() ifaceidx.SwIfIndex
 }
 
 // SwIfIndexes is a constructor for interfaces
@@ -43,7 +47,7 @@ func (step *ThenIface) BfdIndexes() *BfdIndexesAssertions {
 
 // SwIfIndexesAssertions helper struct for fluent DSL in tests for interfaces
 type SwIfIndexesAssertions struct {
-	VPP defaultplugins.API
+	VPP defaultpluginsAPI
 }
 
 // BfdIndexesAssertions helper struct for fluent DSL in tests for bfd

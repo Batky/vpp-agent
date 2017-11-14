@@ -167,9 +167,6 @@ func (plugin *Plugin) resyncParseEvent(resyncEv datasync.ResyncEvent) *DataResyn
 		plugin.Log.Debug("Received RESYNC key ", key)
 	}
 	for key, resyncData := range resyncEv.GetValues() {
-		if plugin.droppedFromResync(key) {
-			continue
-		}
 		if strings.HasPrefix(key, acl.KeyPrefix()) {
 			numAcls := appendACLInterface(resyncData, req)
 			plugin.Log.Debug("Received RESYNC ACL values ", numAcls)
@@ -210,14 +207,6 @@ func (plugin *Plugin) resyncParseEvent(resyncEv datasync.ResyncEvent) *DataResyn
 		}
 	}
 	return req
-}
-func (plugin *Plugin) droppedFromResync(key string) bool {
-	for _, prefix := range plugin.omittedPrefixes {
-		if strings.HasPrefix(key, prefix) {
-			return true
-		}
-	}
-	return false
 }
 
 func resyncAppendARPs(resyncData datasync.KeyValIterator, req *DataResyncReq, log logging.Logger) int {
